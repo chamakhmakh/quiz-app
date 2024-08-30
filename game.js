@@ -37,6 +37,12 @@ let questions = [
 const CORRECT_BONUS = 10;
 const MAX_QUESTIONS = 3;
 
+/* 
+    lena bch juste naamlo inisalization lel counter o score ahna 
+   deja aamlinhom mel fooq ama ena netqoheb o akhrali fih ama 
+   hatyna fih fazet el availableQuestions zedneha hasilou fazet
+ */
+
 startGame = () => {
     questionCounter = 0;
     score = 0;
@@ -44,6 +50,12 @@ startGame = () => {
 
     getNewQuestion()
 };
+
+/*
+    lena l qoheb lkol function hedhi jkuste bech tjiblek question jdida o 
+    gadit feha el choices o feha fazet el return lel page okhra ki yofew les 
+    quesions li aana 
+*/
 
 getNewQuestion = () => {
     if (availableQuestions.length === 0 || questionCounter > MAX_QUESTIONS) {
@@ -70,10 +82,21 @@ choices.forEach(choice => {
         if (!acceptingAnswers) return;
 
         acceptingAnswers = false;
-        const selectedChoise = e.target;
-        const slectedAnswer = selectedChoise.dataset["number"];
+        const selectedChoice = e.target;
+        const selectedAnswer = selectedChoice.dataset["number"];
 
-        getNewQuestion();
+        let classToAplly = "incorrect";
+        if (selectedAnswer == currentQuestion.answer) {
+            classToAplly = "correct";
+        }
+        // const classToAplly = selectedAnswer == currentQuestion.answer ? "correct" : "incorrect";
+
+        selectedChoice.parentElement.classList.add(classToAplly);
+
+        setTimeout(() => {
+            selectedChoice.parentElement.classList.remove(classToAplly);
+            getNewQuestion();
+        }, 1000);
     });
 })
 
