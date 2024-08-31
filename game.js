@@ -12,12 +12,32 @@ let availableQuestions = [];
 
 let questions = [];
 
-fetch("question.json")
+/* 
+    hedhi fecth tjib mel json file el arrays mbaed nhotohom fel questions array 
+    start game hatineha maa load questuion bech ywali yecmhi tool maa json file
+*/
+
+fetch("https://opentdb.com/api.php?amount=10&category=9&difficulty=medium&type=multiple")
 .then(res => {
     return res.json();
 })
 .then (loadedQuestions => {
-    questions = loadedQuestions;
+    console.log(loadedQuestions.results);
+    questions = loadedQuestions.results.map( loadedQuestions => {
+        const formattedQuestions = {
+            question: loadedQuestions.question
+        };
+
+        const answerChoices = [...loadedQuestions.incorrect_answers];
+        formattedQuestions.answer = Math.floor(Math.random() * 3) + 1;
+        answerChoices.splice(formattedQuestions.answer -1, 0, loadedQuestions.correct_answer);
+
+        answerChoices.forEach((choice, index) => {
+            formattedQuestions["choice" + (index+1)] = choice;
+        })
+
+        return formattedQuestions;
+    });
     startGame();
 });
 
