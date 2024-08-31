@@ -2,7 +2,9 @@ const question = document.getElementById("question");
 const choices = Array.from(document.getElementsByClassName("choice-text"));
 const progressText = document.getElementById("progressText");
 const scoreText = document.getElementById("score");
-const progressBarFull = document.getElementById("progressBarFull")
+const progressBarFull = document.getElementById("progressBarFull");
+const loader = document.getElementById("loader");
+const game = document.getElementById("game");
 
 let currentQuestion = {};
 let acceptingAnswers = true;
@@ -12,37 +14,41 @@ let availableQuestions = [];
 
 let questions = [];
 
+
+
 /* 
     hedhi fecth tjib mel json file el arrays mbaed nhotohom fel questions array 
     start game hatineha maa load questuion bech ywali yecmhi tool maa json file
 */
 
-fetch("https://opentdb.com/api.php?amount=10&category=9&difficulty=medium&type=multiple")
-.then(res => {
-    return res.json();
-})
-.then (loadedQuestions => {
-    console.log(loadedQuestions.results);
-    questions = loadedQuestions.results.map( loadedQuestions => {
-        const formattedQuestions = {
-            question: loadedQuestions.question
-        };
+fetch("https://opentdb.com/api.php?amount=30&category=12&difficulty=medium&type=multiple")
+    .then(res => {
+        return res.json();
+    })
+    .then (loadedQuestions => {
+        questions = loadedQuestions.results.map(loadedQuestion => {
+            const formattedQuestions = {
+                question: loadedQuestion.question
+            };
 
-        const answerChoices = [...loadedQuestions.incorrect_answers];
-        formattedQuestions.answer = Math.floor(Math.random() * 3) + 1;
-        answerChoices.splice(formattedQuestions.answer -1, 0, loadedQuestions.correct_answer);
+            const answerChoices = [...loadedQuestion.incorrect_answers];
+            formattedQuestions.answer = Math.floor(Math.random() * 3) + 1;
+            answerChoices.splice(formattedQuestions.answer -1, 0, loadedQuestion.correct_answer);
 
-        answerChoices.forEach((choice, index) => {
-            formattedQuestions["choice" + (index+1)] = choice;
-        })
+            answerChoices.forEach((choice, index) => {
+                formattedQuestions["choice" + (index+1)] = choice;
+            })
 
-        return formattedQuestions;
+            return formattedQuestions;
+        });
+        startGame();
+    })
+    .catch(err => {
+        console.log(err);
     });
-    startGame();
-});
 
 const CORRECT_BONUS = 10;
-const MAX_QUESTIONS = 3;
+const MAX_QUESTIONS = 10;
 
 /* 
     lena bch juste naamlo inisalization lel counter o score ahna 
@@ -55,7 +61,9 @@ startGame = () => {
     score = 0;
     availableQuestions = [...questions];
 
-    getNewQuestion()
+    getNewQuestion();
+    game.classList.remove("hidden");
+    loader.classList.add("hidden");
 };
 
 /*
@@ -65,7 +73,7 @@ startGame = () => {
 */
 
 getNewQuestion = () => {
-    if (availableQuestions.length === 0 || questionCounter > MAX_QUESTIONS) {
+    if (availableQuestions.length === 0 || questionCounter == MAX_QUESTIONS) {
         localStorage.setItem("mostRecentScore", score);
         return window.location.assign("end.html");
     }
@@ -73,7 +81,6 @@ getNewQuestion = () => {
     questionCounter++;
     progressText.innerText = `Quextion ${questionCounter}/${MAX_QUESTIONS}`;
 
-    console.log((questionCounter / MAX_QUESTIONS) * 100);
     progressBarFull.style.width = `${(questionCounter / MAX_QUESTIONS) * 100}%`;
 
     const questionIndex = Math.floor(Math.random() * availableQuestions.length);
